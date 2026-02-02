@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suraj Game Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .container {
+            max-width: 800px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Game <span class="highlight">Hub</span></h1>
+            <p>Choose your challenge</p>
+        </header>
+
+        <div class="games-grid">
+            <a href="/tictactoe" class="game-card">
+                <span class="game-icon">❌⭕</span>
+                <h2>Tic Tac Toe</h2>
+                <p>The classic unbeatable AI challenge.</p>
+            </a>
+
+            <a href="/rockpaperscissors" class="game-card">
+                <span class="game-icon">🪨📄✂️</span>
+                <h2>Rock Paper Scissors</h2>
+                <p>Test your luck against the computer.</p>
+            </a>
+
+            <div class="game-card" style="opacity: 0.5; cursor: default;">
+                <span class="game-icon">❓</span>
+                <h2>Coming Soon</h2>
+                <p>More games in development.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

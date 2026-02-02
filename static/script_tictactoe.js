@@ -1,5 +1,5 @@
 
-const API_BASE = '/api';
+const API_BASE = '/api/tictactoe';
 
 // UI Elements
 const boardEl = document.getElementById('board');
@@ -39,12 +39,13 @@ async function startGame(mode = 'single') {
         renderBoard(data.board);
 
         if (mode === 'single') {
-            updateScore(data.score);
             statusEl.textContent = "Your Turn (X)";
         } else {
-            updateScore("-"); // No session score in multiplayer
             statusEl.textContent = "Player X's Turn";
         }
+
+        // Always show current score
+        updateScore(data.score);
 
         // Show Game Area, Hide Menu/Modals
         menuArea.classList.add('hidden');
@@ -79,9 +80,7 @@ async function makeMove(row, col) {
         }
 
         renderBoard(data.board);
-        if (currentGameMode === 'single') {
-            updateScore(data.score ?? 0);
-        }
+        updateScore(data.score ?? 0); // Handle updated score if returned
 
         if (data.status === 'win') {
             isGameActive = false;

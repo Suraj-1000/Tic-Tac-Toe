@@ -14,6 +14,7 @@
     <div class="container">
         <!-- Header -->
         <header>
+            <a href="/" class="btn secondary small" style="position: absolute; top: 20px; left: 20px;">&larr; Hub</a>
             <h1>Noughts <span class="highlight">&</span> Crosses</h1>
             <p>Can you beat the AI?</p>
         </header>
@@ -61,7 +62,7 @@
             <div class="modal-content">
                 <h2 id="modal-title">Game Over</h2>
                 <p id="modal-msg">Checkmate!</p>
-                <button onclick="startGame()" class="btn primary">Play Again</button>
+                <button onclick="startGame(currentGameMode)" class="btn primary">Play Again</button>
                 <button onclick="showMenu()" class="btn secondary">Menu</button>
             </div>
         </div>
@@ -80,7 +81,7 @@
         </div>
 
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script_tictactoe.js') }}"></script>
 </body>
 
 </html>

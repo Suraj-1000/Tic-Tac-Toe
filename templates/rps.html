@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .rps-choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .rps-btn {
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .rps-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .result-area {
+            font-size: 1.5rem;
+            min-height: 100px;
+            margin-top: 20px;
+        }
+
+        .vs {
+            font-family: 'Orbitron';
+            font-size: 2rem;
+            margin: 0 20px;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="btn secondary small"
+            style="position: absolute; top: 20px; left: 20px; text-decoration: none;">&larr; Hub</a>
+
+        <header>
+            <h1>Rock <span class="highlight">Paper</span> Scissors</h1>
+            <p>Beat the Computer!</p>
+        </header>
+
+        <div class="hud">
+            <div class="score-box">
+                <span>Score:</span>
+                <span id="score-display">0</span>
+            </div>
+            <div id="status-display" class="status">Make your move</div>
+        </div>
+
+        <div class="rps-choices">
+            <button class="rps-btn" onclick="play('rock')">🪨</button>
+            <button class="rps-btn" onclick="play('paper')">📄</button>
+            <button class="rps-btn" onclick="play('scissors')">✂️</button>
+        </div>
+
+        <div class="result-area" id="result-area">
+            <!-- Results shown here -->
+        </div>
+
+    </div>
+
+    <script>
+        async function play(choice) {
+            const resultDiv = document.getElementById('result-area');
+            const scoreEl = document.getElementById('score-display');
+            const statusEl = document.getElementById('status-display');
+
+            resultDiv.innerHTML = '<span class="status">Computer is choosing...</span>';
+
+            try {
+                const res = await fetch('/api/rps/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ choice })
+                });
+                const data = await res.json();
+
+                scoreEl.textContent = data.score;
+
+                const emojis = { rock: '🪨', paper: '📄', scissors: '✂️' };
+
+                let outcomeText = "";
+                let outcomeClass = "";
+
+                if (data.result === 'win') {
+                    outcomeText = "YOU WIN!";
+                    outcomeClass = "highlight"; // Green
+                } else if (data.result === 'lose') {
+                    outcomeText = "YOU LOSE!";
+                    outcomeClass = "danger"; // Red (need to ensure danger class exists or use inline style)
+                } else {
+                    outcomeText = "DRAW!";
+                    outcomeClass = "status"; // Blue
+                }
+
+                statusEl.textContent = outcomeText;
+
+                resultDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 3rem;">${emojis[data.user]}</div>
+                            <small>You</small>
+                        </div>
+                        <span class="vs">VS</span>
+                        <div style="text-align: center;">
+                            <div style="font-size: 3rem;">${emojis[data.computer]}</div>
+                            <small>Comp</small>
+                        </div>
+                    </div>
+                    <h2 class="${outcomeClass}" style="margin-top: 20px;">${outcomeText}</h2>
+                `;
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+
+</html>
