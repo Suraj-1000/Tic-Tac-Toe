@@ -26,14 +26,25 @@ def get_empty_board():
 def home():
     return render_template('index.html')
 
+
 @app.route('/api/start', methods=['POST'])
 def start_game():
-    # Initialize board in session
-    # We store board as a list of lists strings
-    board = get_empty_board()
-    session['board'] = board
-    session['score'] = session.get('score', 0) # Keep session score if exists
-    return jsonify({'board': board, 'message': 'Game Started', 'score': session['score']})
+    data = request.json or {}
+    mode = data.get('mode', 'single') # 'single' or 'multi'
+    
+    # Initialize session
+    session['board'] = get_empty_board()
+    session['score'] = session.get('score', 0)
+    session['mode'] = mode
+    session['turn'] = 'X' # For multiplayer, tracking whose turn it is
+    
+    return jsonify({
+        'board': session['board'], 
+        'message': 'Game Started', 
+        'score': session['score'],
+        'mode': mode,
+        'turn': 'X'
+    })
 
 @app.route('/api/move', methods=['POST'])
 def player_move():
@@ -44,70 +55,102 @@ def player_move():
     row = int(data.get('row'))
     col = int(data.get('col'))
     board = session['board']
+    mode = session.get('mode', 'single')
+    current_turn = session.get('turn', 'X')
 
     # Validation
     if board[row][col] != ' ':
         return jsonify({'error': 'Invalid move'}), 400
 
-    # 1. Player Move
-    board[row][col] = 'X'
-    
-    # Check Win/Draw for X
-    if check_for_win(board, 'X'):
-        session['score'] += 1
-        session.modified = True # Ensure session saves
+    # Logic for Multiplayer
+    if mode == 'multi':
+        board[row][col] = current_turn
+        
+        # Check Win
+        if check_for_win(board, current_turn):
+            session.modified = True
+            return jsonify({
+                'board': board,
+                'status': 'win',
+                'winner': current_turn,
+                'mode': mode
+            })
+            
+        # Check Draw
+        if check_for_draw(board):
+            session.modified = True
+            return jsonify({
+                'board': board,
+                'status': 'draw',
+                'mode': mode
+            })
+            
+        # Switch Turn
+        next_turn = 'O' if current_turn == 'X' else 'X'
+        session['turn'] = next_turn
+        session['board'] = board
         return jsonify({
-            'board': board, 
-            'status': 'win', 
-            'winner': 'X',
-            'score': session['score']
-        })
-    
-    if check_for_draw(board):
-        session.modified = True
-        return jsonify({
-            'board': board, 
-            'status': 'draw',
-            'score': session['score']
+            'board': board,
+            'status': 'ongoing',
+            'turn': next_turn,
+            'mode': mode
         })
 
-    # 2. Computer Move
-    # Ensure choose_computer_move modifies OUR board structure correctly
-    # The original function modifies the list in-place and returns (row, col) or just modifies it.
-    # Looking at the original code: returns (row, col), but logic inside essentially finds a move.
-    # Actually checking original file content:
-    # it *returns* row, col. It does NOT modify the board permanently essentially?
-    # Wait, the original `choose_computer_move` in `noughtsandcrosses_2613499.py` (step 9 view):
-    # It does `board[row][col] = 'O'` then BACKTRACKS `board[row][col] = ' '` when SEARCHING.
-    # But when it returns, it just returns the row/col. It does NOT make the move on the board passed to it permanently.
-    
-    # SO we must apply the move here.
-    comp_row, comp_col = choose_computer_move(board)
-    
-    if comp_row is not None and comp_col is not None:
-         board[comp_row][comp_col] = 'O'
-         
-         # Check Win/Draw for O
-         if check_for_win(board, 'O'):
-             session['score'] -= 1
-             session.modified = True
-             return jsonify({
-                 'board': board, 
-                 'status': 'win', 
-                 'winner': 'O',
-                 'score': session['score']
-             })
+    # Logic for Single Player (User is always X)
+    else:
+        # 1. Player Move
+        board[row][col] = 'X'
+        
+        # Check Win/Draw for X
+        if check_for_win(board, 'X'):
+            session['score'] += 1
+            session.modified = True
+            return jsonify({
+                'board': board, 
+                'status': 'win', 
+                'winner': 'X',
+                'score': session['score'],
+                'mode': mode
+            })
+        
+        if check_for_draw(board):
+            session.modified = True
+            return jsonify({
+                'board': board, 
+                'status': 'draw',
+                'score': session['score'],
+                'mode': mode
+            })
+
+        # 2. Computer Move
+        comp_row, comp_col = choose_computer_move(board)
+        
+        if comp_row is not None and comp_col is not None:
+             board[comp_row][comp_col] = 'O'
              
-         if check_for_draw(board):
-             session.modified = True
-             return jsonify({
-                 'board': board, 
-                 'status': 'draw',
-                 'score': session['score']
-             })
-    
-    session['board'] = board
-    return jsonify({'board': board, 'status': 'ongoing', 'score': session['score']})
+             # Check Win/Draw for O
+             if check_for_win(board, 'O'):
+                 session['score'] -= 1
+                 session.modified = True
+                 return jsonify({
+                     'board': board, 
+                     'status': 'win', 
+                     'winner': 'O',
+                     'score': session['score'],
+                     'mode': mode
+                 })
+                 
+             if check_for_draw(board):
+                 session.modified = True
+                 return jsonify({
+                     'board': board, 
+                     'status': 'draw',
+                     'score': session['score'],
+                     'mode': mode
+                 })
+        
+        session['board'] = board
+        return jsonify({'board': board, 'status': 'ongoing', 'score': session['score'], 'mode': mode})
 
 @app.route('/api/save', methods=['POST'])
 def save_score():

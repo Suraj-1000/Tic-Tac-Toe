@@ -22,15 +22,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- API Interactions ---
 
-async function startGame() {
+
+let currentGameMode = 'single';
+
+async function startGame(mode = 'single') {
+    currentGameMode = mode;
     try {
-        const res = await fetch(`${API_BASE}/start`, { method: 'POST' });
+        const res = await fetch(`${API_BASE}/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode })
+        });
         const data = await res.json();
 
         isGameActive = true;
         renderBoard(data.board);
-        updateScore(data.score);
-        statusEl.textContent = "Your Turn (X)";
+
+        if (mode === 'single') {
+            updateScore(data.score);
+            statusEl.textContent = "Your Turn (X)";
+        } else {
+            updateScore("-"); // No session score in multiplayer
+            statusEl.textContent = "Player X's Turn";
+        }
 
         // Show Game Area, Hide Menu/Modals
         menuArea.classList.add('hidden');
@@ -46,11 +60,10 @@ async function startGame() {
 async function makeMove(row, col) {
     if (!isGameActive) return;
 
-    // Optimistic UI update (optional, but good for response time)
-    // For now we'll wait for server for simplicity and correctness with "computer thinking"
-
     try {
-        statusEl.textContent = "Computer Thinking...";
+        if (currentGameMode === 'single') {
+            statusEl.textContent = "Computer Thinking...";
+        }
 
         const res = await fetch(`${API_BASE}/move`, {
             method: 'POST',
@@ -66,16 +79,34 @@ async function makeMove(row, col) {
         }
 
         renderBoard(data.board);
-        updateScore(data.score ?? 0); // Handle updated score if returned
+        if (currentGameMode === 'single') {
+            updateScore(data.score ?? 0);
+        }
 
         if (data.status === 'win') {
             isGameActive = false;
-            showEndGame(data.winner === 'X' ? "You Won!" : "Computer Won!", data.winner === 'X' ? "Great job!" : "Better luck next time.");
+            let msg = "";
+            let title = "Game Over";
+
+            if (currentGameMode === 'single') {
+                msg = data.winner === 'X' ? "You Won!" : "Computer Won!";
+                title = data.winner === 'X' ? "Victory!" : "Defeat";
+            } else {
+                msg = `Player ${data.winner} Wins!`;
+                title = "Victory!";
+            }
+            showEndGame(title, msg);
+
         } else if (data.status === 'draw') {
             isGameActive = false;
             showEndGame("Draw!", "No moves left.");
         } else {
-            statusEl.textContent = "Your Turn (X)";
+            // Ongoing
+            if (currentGameMode === 'single') {
+                statusEl.textContent = "Your Turn (X)";
+            } else {
+                statusEl.textContent = `Player ${data.turn}'s Turn`;
+            }
         }
 
     } catch (e) {

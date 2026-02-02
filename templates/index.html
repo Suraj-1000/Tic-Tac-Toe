@@ -1,13 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unbeatable Noughts & Crosses</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -38,7 +40,8 @@
 
         <!-- Main Menu -->
         <section id="menu-area">
-            <button onclick="startGame()" class="btn primary huge glow">Play Game</button>
+            <button onclick="startGame('single')" class="btn primary huge glow">vs AI (Single Player)</button>
+            <button onclick="startGame('multi')" class="btn primary huge">vs Human (2 Player)</button>
             <button onclick="showLeaderboard()" class="btn secondary huge">Leaderboard</button>
         </section>
 
@@ -62,7 +65,7 @@
                 <button onclick="showMenu()" class="btn secondary">Menu</button>
             </div>
         </div>
-        
+
         <!-- Save Score Modal -->
         <div id="save-modal" class="modal hidden">
             <div class="modal-content">
@@ -79,4 +82,5 @@
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
