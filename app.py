@@ -37,6 +37,14 @@ def rps_page():
 def hangman_page():
     return render_template('hangman.html')
 
+@app.route('/memory')
+def memory_page():
+    return render_template('memory.html')
+
+@app.route('/snake')
+def snake_page():
+    return render_template('snake.html')
+
 # --- HANGMAN API ---
 WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]
 

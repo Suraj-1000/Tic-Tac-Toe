@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Neon Snake{% endblock %}
+
+{% block head %}
+<style>
+    canvas {
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid var(--glass-border);
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .score-hud {
+        font-family: 'Orbitron';
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <header>
+        <h1>Neon <span class="highlight">Snake</span></h1>
+    </header>
+
+    <div class="score-hud">
+        Score: <span id="score" class="highlight">0</span>
+    </div>
+
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <div style="margin-top:20px; color: var(--text-dim);">
+        Use Arrow Keys onto play
+    </div>
+
+    <button onclick="startGame()" class="btn primary" id="start-btn" style="margin-top:20px;">Start Game</button>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gridSize = 15;
+    const tileCount = canvas.width / gridSize;
+
+    let score = 0;
+    let velocityX = 0;
+    let velocityY = 0;
+    let playerX = 10;
+    let playerY = 10;
+    let trail = [];
+    let tail = 5;
+    let appleX = 15;
+    let appleY = 15;
+    let gameInterval;
+    let isRunning = false;
+
+    function startGame() {
+        if (isRunning) return;
+
+        score = 0;
+        tail = 5;
+        playerX = 10;
+        playerY = 10;
+        velocityX = 1;
+        velocityY = 0;
+        document.getElementById('score').textContent = score;
+        document.getElementById('start-btn').textContent = "Restart";
+
+        isRunning = true;
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, 1000 / 10); // 10 FPS
+    }
+
+    function gameLoop() {
+        playerX += velocityX;
+        playerY += velocityY;
+
+        // Wrap walls
+        if (playerX < 0) playerX = tileCount - 1;
+        if (playerX > tileCount - 1) playerX = 0;
+        if (playerY < 0) playerY = tileCount - 1;
+        if (playerY > tileCount - 1) playerY = 0;
+
+        // Background
+        ctx.fillStyle = "rgba(0,0,0,0.4)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Snake
+        ctx.fillStyle = "#00ff88";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#00ff88";
+
+        for (let i = 0; i < trail.length; i++) {
+            ctx.fillRect(trail[i].x * gridSize, trail[i].y * gridSize, gridSize - 2, gridSize - 2);
+
+            // Self collision
+            if (trail[i].x === playerX && trail[i].y === playerY) {
+                // Game Over logic could go here
+                tail = 5;
+                score = 0;
+                document.getElementById('score').textContent = score;
+            }
+        }
+        ctx.shadowBlur = 0;
+
+        trail.push({ x: playerX, y: playerY });
+        while (trail.length > tail) {
+            trail.shift();
+        }
+
+        // Apple
+        if (appleX === playerX && appleY === playerY) {
+            tail++;
+            score++;
+            document.getElementById('score').textContent = score;
+            appleX = Math.floor(Math.random() * tileCount);
+            appleY = Math.floor(Math.random() * tileCount);
+        }
+
+        ctx.fillStyle = "#ff4444";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#ff4444";
+        ctx.beginPath();
+        ctx.arc((appleX * gridSize) + gridSize / 2, (appleY * gridSize) + gridSize / 2, gridSize / 2 - 2, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
+    document.addEventListener('keydown', keyPush);
+
+    function keyPush(evt) {
+        if (!isRunning && (evt.keyCode >= 37 && evt.keyCode <= 40)) startGame();
+
+        switch (evt.keyCode) {
+            case 37: // Left
+                if (velocityX === 1) break;
+                velocityX = -1; velocityY = 0;
+                break;
+            case 38: // Up
+                if (velocityY === 1) break;
+                velocityX = 0; velocityY = -1;
+                break;
+            case 39: // Right
+                if (velocityX === -1) break;
+                velocityX = 1; velocityY = 0;
+                break;
+            case 40: // Down
+                if (velocityY === -1) break;
+                velocityX = 0; velocityY = 1;
+                break;
+        }
+    }
+</script>
+{% endblock %}
