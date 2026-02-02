@@ -45,6 +45,14 @@ def memory_page():
 def snake_page():
     return render_template('snake.html')
 
+@app.route('/drive')
+def drive_page():
+    return render_template('drive.html')
+
+@app.route('/football')
+def football_page():
+    return render_template('football.html')
+
 # --- HANGMAN API ---
 WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]
 

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Neon Drive{% endblock %}
+
+{% block head %}
+<style>
+    canvas {
+        background: radial-gradient(circle at center, #1a1a2e, #000);
+        border: 2px solid var(--glass-border);
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .score-hud {
+        font-family: 'Orbitron';
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px;">
+    <header>
+        <h1>Neon <span class="highlight">Drive</span></h1>
+    </header>
+
+    <div class="score-hud">
+        Score: <span id="score" class="highlight">0</span>
+    </div>
+
+    <canvas id="gameCanvas" width="300" height="500"></canvas>
+
+    <div style="margin-top:20px; color: var(--text-dim);">
+        Use Left/Right Arrows to Dodge!
+    </div>
+
+    <button onclick="startGame()" class="btn primary" id="start-btn" style="margin-top:20px;">Start Engine</button>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let carX = 125;
+    let carY = 400;
+    let carW = 50;
+    let carH = 80;
+
+    let obstacles = [];
+    let score = 0;
+    let speed = 5;
+    let gameInterval;
+    let isRunning = false;
+    let roadOffset = 0;
+
+    function startGame() {
+        if (isRunning) return;
+
+        score = 0;
+        speed = 5;
+        obstacles = [];
+        carX = 125;
+        document.getElementById('score').textContent = score;
+        document.getElementById('start-btn').textContent = "Restart";
+
+        isRunning = true;
+
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, 20); // 50 FPS
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+    }
+
+    function update() {
+        // Move Road
+        roadOffset += speed;
+        if (roadOffset > 40) roadOffset = 0;
+
+        // Spawn Obstacles
+        if (Math.random() < 0.02) {
+            obstacles.push({
+                x: Math.random() < 0.5 ? 50 : 200, // Two lanes essentially
+                y: -100,
+                w: 50,
+                h: 50,
+                color: Math.random() < 0.5 ? '#ff4444' : '#ffff00'
+            });
+        }
+
+        // Move Obstacles
+        for (let i = 0; i < obstacles.length; i++) {
+            obstacles[i].y += speed;
+
+            // Collision
+            if (
+                carX < obstacles[i].x + obstacles[i].w &&
+                carX + carW > obstacles[i].x &&
+                carY < obstacles[i].y + obstacles[i].h &&
+                carH + carY > obstacles[i].y
+            ) {
+                gameOver();
+            }
+
+            // Remove off-screen
+            if (obstacles[i].y > canvas.height) {
+                obstacles.splice(i, 1);
+                score++;
+                document.getElementById('score').textContent = score;
+                i--;
+
+                // Increase speed
+                if (score % 10 === 0) speed += 0.5;
+            }
+        }
+    }
+
+    function draw() {
+        // Clear
+        ctx.fillStyle = "#111";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Road Lines
+        ctx.strokeStyle = "rgba(0, 255, 136, 0.3)";
+        ctx.lineWidth = 4;
+        ctx.setLineDash([20, 20]);
+        ctx.lineDashOffset = -roadOffset;
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, -50);
+        ctx.lineTo(canvas.width / 2, canvas.height + 50);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(10, 0); ctx.lineTo(10, canvas.height);
+        ctx.moveTo(canvas.width - 10, 0); ctx.lineTo(canvas.width - 10, canvas.height);
+        ctx.stroke();
+
+        // Player Car
+        ctx.fillStyle = "#00ccff";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#00ccff";
+        ctx.fillRect(carX, carY, carW, carH);
+
+        // Tail lights
+        ctx.fillStyle = "#ff4444";
+        ctx.fillRect(carX + 5, carY + carH - 10, 10, 5);
+        ctx.fillRect(carX + carW - 15, carY + carH - 10, 10, 5);
+        ctx.shadowBlur = 0;
+
+        // Obstacles
+        for (let o of obstacles) {
+            ctx.fillStyle = o.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = o.color;
+            ctx.fillRect(o.x, o.y, o.w, o.h);
+        }
+    }
+
+    function gameOver() {
+        isRunning = false;
+        clearInterval(gameInterval);
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.fillRect(0, canvas.height / 2 - 40, canvas.width, 80);
+        ctx.fillStyle = "#fff";
+        ctx.font = "30px Orbitron";
+        ctx.textAlign = "center";
+        ctx.fillText("CRASH!", canvas.width / 2, canvas.height / 2 + 10);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (!isRunning) return;
+        if (e.key === 'ArrowLeft' && carX > 50) carX -= 75; // Lane switch left
+        if (e.key === 'ArrowRight' && carX < 200) carX += 75; // Lane switch right
+    });
+</script>
+{% endblock %}
