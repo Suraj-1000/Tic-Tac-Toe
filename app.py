@@ -33,6 +33,66 @@ def tictactoe_page():
 def rps_page():
     return render_template('rps.html')
 
+@app.route('/hangman')
+def hangman_page():
+    return render_template('hangman.html')
+
+# --- HANGMAN API ---
+WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]
+
+@app.route('/api/hangman/start', methods=['POST'])
+def hangman_start():
+    word = random.choice(WORDS)
+    session['hm_word'] = word
+    session['hm_guessed'] = []
+    session['hm_lives'] = 6
+    
+    return jsonify({
+        'display': "_ " * len(word),
+        'lives': 6,
+        'guessed': [],
+        'status': 'ongoing'
+    })
+
+@app.route('/api/hangman/guess', methods=['POST'])
+def hangman_guess():
+    if 'hm_word' not in session: return jsonify({'error': 'Game not started'}), 400
+    
+    letter = request.json.get('letter')
+    word = session['hm_word']
+    guessed = session['hm_guessed']
+    
+    if letter in guessed:
+        return jsonify({'error': 'Already guessed'}), 400
+        
+    guessed.append(letter)
+    session['hm_guessed'] = guessed
+    
+    correct = letter in word
+    
+    if not correct:
+        session['hm_lives'] -= 1
+        
+    # Build display
+    display_arr = [l if l in guessed else '_' for l in word]
+    display = " ".join(display_arr)
+    
+    status = 'ongoing'
+    if '_' not in display_arr:
+        status = 'win'
+    elif session['hm_lives'] <= 0:
+        status = 'lose'
+
+    session.modified = True
+    return jsonify({
+        'display': display,
+        'lives': session['hm_lives'],
+        'correct': correct,
+        'status': status,
+        'word': word if status == 'lose' else None
+    })
+
+
 
 # --- TIC TAC TOE API ---
 

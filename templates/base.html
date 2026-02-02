@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Suraj Game Hub{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="site-wrapper">
+        <header class="main-header">
+            <nav class="glass-nav">
+                <a href="/" class="logo">SURAJ<span class="highlight">GAMES</span></a>
+                <div class="nav-links">
+                    <a href="/" class="nav-item">Hub</a>
+                    <a href="/tictactoe" class="nav-item">Tic Tac Toe</a>
+                    <a href="/rockpaperscissors" class="nav-item">RPS</a>
+                    <a href="/hangman" class="nav-item">Hangman</a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="main-footer">
+            <p>&copy; 2026 Suraj Game Hub. Created with Flask & Python.</p>
+        </footer>
+    </div>
+</body>
+
+</html>
