@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Pro Football 11v11{% endblock %}
+{% block title %}Neon Futsal 5v5{% endblock %}
 
 {% block head %}
 <style>
@@ -11,31 +11,32 @@
         margin-top: 20px;
     }
 
-    /* Grass Field Style */
+    /* Futsal Court Style: Hard Court (Blue/Wood) */
     canvas {
-        border: 4px solid white;
-        background: #2ecc71;
-        /* Green Grass */
+        border: 4px solid #fff;
+        background: #34495e;
+        /* Hard Court Color */
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         border-radius: 4px;
         cursor: none;
+        /* Hide default cursor */
     }
 
     .scoreboard {
         display: flex;
         justify-content: space-between;
-        width: 1000px;
+        width: 800px;
         margin-bottom: 10px;
         padding: 10px 20px;
         background: rgba(0, 0, 0, 0.8);
         border-radius: 10px;
         color: white;
-        font-family: 'Arial', sans-serif;
-        border: 2px solid white;
+        font-family: 'Courier New', monospace;
+        border: 1px solid #555;
     }
 
     .team-score {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: bold;
     }
 
@@ -48,16 +49,15 @@
     }
 
     .timer {
-        font-size: 2.5rem;
-        color: #fff;
+        font-size: 2rem;
+        color: #f1c40f;
     }
 
     .controls-hint {
         margin-top: 15px;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.5);
-        padding: 10px;
-        border-radius: 5px;
+        color: #ccc;
+        font-size: 0.9em;
+        text-align: center;
     }
 
     .key {
@@ -77,38 +77,34 @@
 <div class="game-container">
     <div class="scoreboard">
         <div class="team-score team-blue">BLUE <span id="scoreBlue">0</span></div>
-        <div class="timer" id="gameTimer">45:00</div>
+        <div class="timer" id="gameTimer">10:00</div>
         <div class="team-score team-red"><span id="scoreRed">0</span> RED</div>
     </div>
 
-    <!-- Larger Canvas for 11v11 -->
-    <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
 
     <div class="controls-hint">
         <p>
-            <span class="key">Arrows</span> / <span class="key">WASD</span> Move Active Player &nbsp;
+            <span class="key">Arrows</span> / <span class="key">WASD</span> Move &nbsp;
             <span class="key">Space</span> / <span class="key">Click</span> Shoot/Pass &nbsp;
             <span class="key">Shift</span> Sprint
         </p>
+        <p>First to 5 Goals Wins!</p>
     </div>
 </div>
 
 <script>
-    // Configuration for 11v11 Football
+    // Configuration for Futsal
     window.SOCCER_CONFIG = {
-        type: 'football',
-        pitchColor: '#2ecc71',
-        lineColor: '#FFF',
-        ballColor: '#FFF',
-        playersPerTeam: 11,
-        matchDuration: 2700, // 45 minutes scale usually but let's do 5 mins real time? Let's stick to engine timer
-        matchDuration: 300,
+        type: 'futsal',
+        pitchColor: '#2c3e50',
+        lineColor: '#ecf0f1',
+        ballColor: '#f1c40f',
+        playersPerTeam: 5,
+        matchDuration: 600, // 10 minutes
         physics: {
-            friction: 0.98, // Grass
-            ballBounce: 0.7,
-            playerSpeed: 3.0,
-            sprintSpeed: 5.0,
-            kickForce: 8.0
+            friction: 0.94, // Hard court, more friction/stop
+            ballBounce: 0.6 // Low bounce futsal ball
         }
     };
 </script>

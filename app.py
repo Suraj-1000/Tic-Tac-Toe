@@ -53,6 +53,10 @@ def drive_page():
 def football_page():
     return render_template('football.html')
 
+@app.route('/futsal')
+def futsal_page():
+    return render_template('futsal.html')
+
 # --- HANGMAN API ---
 WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]
 
