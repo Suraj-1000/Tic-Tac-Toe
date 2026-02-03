@@ -40,13 +40,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="game-container">
-    <canvas id="carromCanvas" width="600" height="600"></canvas>
-    <div class="status" id="statusText">White's Turn</div>
-    <div class="controls-hint">
-        Click & Drag striker to Aim. Release to Shoot.
-    </div>
-</div>
 
-<script src="{{ url_for('static', filename='game_carrom.js') }}?v={{ range(1, 10000) | random }}"></script>
-{% endblock %}
+<body class="t-carrom">
+    <div class="game-container">
+        <canvas id="carromCanvas" width="600" height="600"></canvas>
+        <div class="status" id="statusText">White's Turn</div>
+        <div class="controls-hint">
+            Click & Drag striker to Aim. Release to Shoot.
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='game_carrom.js') }}?v={{ range(1, 10000) | random }}"></script>
+    {% endblock %}

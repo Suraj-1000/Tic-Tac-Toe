@@ -74,49 +74,51 @@
 {% endblock %}
 
 {% block content %}
-<div class="game-container">
-    <div class="scoreboard">
-        <div class="team-score team-blue">BLUE <span id="scoreBlue">0</span></div>
-        <div class="timer" id="gameTimer">45:00</div>
-        <div class="team-score team-red"><span id="scoreRed">0</span> RED</div>
+
+<body class="t-football">
+    <div class="game-container">
+        <div class="scoreboard">
+            <div class="team-score team-blue">BLUE <span id="scoreBlue">0</span></div>
+            <div class="timer" id="gameTimer">45:00</div>
+            <div class="team-score team-red"><span id="scoreRed">0</span> RED</div>
+        </div>
+
+        <!-- Larger Canvas for 11v11 -->
+        <canvas id="gameCanvas" width="1000" height="600"></canvas>
+
+        <div class="controls-hint">
+            <p>
+                <span class="key">Arrows</span> / <span class="key">WASD</span> Move Active Player &nbsp;
+                <span class="key">Space</span> / <span class="key">Click</span> Shoot/Pass &nbsp;
+                <span class="key">Shift</span> Sprint
+            </p>
+        </div>
     </div>
 
-    <!-- Larger Canvas for 11v11 -->
-    <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    <script>
+        // Configuration for Football/Futsal
+        // game_type passed from Flask: '{{ game_type }}'
+        const isFutsal = '{{ game_type }}' === 'futsal';
 
-    <div class="controls-hint">
-        <p>
-            <span class="key">Arrows</span> / <span class="key">WASD</span> Move Active Player &nbsp;
-            <span class="key">Space</span> / <span class="key">Click</span> Shoot/Pass &nbsp;
-            <span class="key">Shift</span> Sprint
-        </p>
-    </div>
-</div>
-
-<script>
-    // Configuration for Football/Futsal
-    // game_type passed from Flask: '{{ game_type }}'
-    const isFutsal = '{{ game_type }}' === 'futsal';
-
-    window.SOCCER_CONFIG = {
-        type: isFutsal ? 'futsal' : 'football',
-        pitchColor: isFutsal ? '#34495e' : '#2ecc71', // Blue court for futsal
-        lineColor: '#FFF',
-        ballColor: '#FFF',
-        playersPerTeam: isFutsal ? 5 : 11,
-        matchDuration: 300,
-        physics: {
-            friction: isFutsal ? 0.94 : 0.98, // Court is faster/slippery? Or less friction? 0.94 is more friction (slows down faster). Actually Hard court = fast ball. Grass = slow ball. 
-            // 0.98 (Grass) -> Ball slides long. 
-            // Futsal Hard Court -> Ball rolls fast but stops? 
-            // Let's keep similar for now.
-            friction: 0.97,
-            ballBounce: isFutsal ? 0.8 : 0.7,
-            playerSpeed: 3.0,
-            sprintSpeed: 5.0,
-            kickForce: 8.0
-        }
-    };
-</script>
-<script src="{{ url_for('static', filename='game_soccer.js') }}?v={{ range(1, 10000) | random }}"></script>
-{% endblock %}
+        window.SOCCER_CONFIG = {
+            type: isFutsal ? 'futsal' : 'football',
+            pitchColor: isFutsal ? '#34495e' : '#2ecc71', // Blue court for futsal
+            lineColor: '#FFF',
+            ballColor: '#FFF',
+            playersPerTeam: isFutsal ? 5 : 11,
+            matchDuration: 300,
+            physics: {
+                friction: isFutsal ? 0.94 : 0.98, // Court is faster/slippery? Or less friction? 0.94 is more friction (slows down faster). Actually Hard court = fast ball. Grass = slow ball. 
+                // 0.98 (Grass) -> Ball slides long. 
+                // Futsal Hard Court -> Ball rolls fast but stops? 
+                // Let's keep similar for now.
+                friction: 0.97,
+                ballBounce: isFutsal ? 0.8 : 0.7,
+                playerSpeed: 3.0,
+                sprintSpeed: 5.0,
+                kickForce: 8.0
+            }
+        };
+    </script>
+    <script src="{{ url_for('static', filename='game_soccer.js') }}?v={{ range(1, 10000) | random }}"></script>
+    {% endblock %}

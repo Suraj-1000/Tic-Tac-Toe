@@ -303,3 +303,119 @@ h1 {
     font-size: 0.9rem;
     background: rgba(0, 0, 0, 0.2);
 }
+
+/* --- Game Themes (Character) --- */
+
+/* Theme: Tic-Tac-Toe (Cyber Neon) */
+.t-tictactoe {
+    --primary: #00ff9d;
+    --secondary: #00e5ff;
+}
+
+/* Theme: Hangman (Dungeon Red) */
+.t-hangman {
+    --bg-color-1: #1a0505;
+    --bg-color-2: #2c0909;
+    --bg-color-3: #000000;
+    --primary: #ff4444;
+    --primary-glow: rgba(255, 68, 68, 0.6);
+    --secondary: #ff8800;
+    --secondary-glow: rgba(255, 136, 0, 0.6);
+}
+
+/* Theme: Football/Futsal/Penalty (Stadium Green) */
+.t-football {
+    --bg-color-1: #051a0d;
+    --bg-color-2: #0f2e1a;
+    --bg-color-3: #020c06;
+    --primary: #2ecc71;
+    --primary-glow: rgba(46, 204, 113, 0.6);
+    --secondary: #f1c40f;
+    --secondary-glow: rgba(241, 196, 15, 0.6);
+}
+
+/* Theme: Snake (Retro Purple) */
+.t-snake {
+    --bg-color-1: #0f051a;
+    --bg-color-2: #1e0a2e;
+    --bg-color-3: #05020a;
+    --primary: #9b59b6;
+    --primary-glow: rgba(155, 89, 182, 0.6);
+    --secondary: #00ff00;
+    --secondary-glow: rgba(0, 255, 0, 0.6);
+}
+
+/* Theme: Drive (Hot Asphalt) */
+.t-drive {
+    --bg-color-1: #2c3e50;
+    --bg-color-2: #34495e;
+    --bg-color-3: #1a252f;
+    --primary: #e74c3c;
+    --primary-glow: rgba(231, 76, 60, 0.6);
+    --secondary: #f39c12;
+    --secondary-glow: rgba(243, 156, 18, 0.6);
+}
+
+/* Theme: Memory (Mind Blue) */
+.t-memory {
+    --bg-color-1: #050f1a;
+    --bg-color-2: #0a1f33;
+    --bg-color-3: #02060a;
+    --primary: #3498db;
+    --primary-glow: rgba(52, 152, 219, 0.6);
+    --secondary: #e67e22;
+    --secondary-glow: rgba(230, 126, 34, 0.6);
+}
+
+/* Theme: Carrom (Golden Wood) */
+.t-carrom {
+    --bg-color-1: #2d261e;
+    --bg-color-2: #46392d;
+    --bg-color-3: #1a1612;
+    --primary: #f1c40f;
+    --primary-glow: rgba(241, 196, 15, 0.6);
+    --secondary: #ecf0f1;
+    --secondary-glow: rgba(236, 240, 241, 0.4);
+}
+
+/* Theme: HideSeek (Stealth Dark) */
+.t-hideseek {
+    --bg-color-1: #000000;
+    --bg-color-2: #111111;
+    --bg-color-3: #080808;
+    --primary: #bdc3c7;
+    --primary-glow: rgba(189, 195, 199, 0.4);
+    --secondary: #f1c40f;
+    --secondary-glow: rgba(241, 196, 15, 0.6);
+    animation: none !important;
+}
+
+/* Character Icons (CSS Emblems) */
+.emblem {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0)
+    }
+
+    50% {
+        transform: translateY(-5px)
+    }
+
+    100% {
+        transform: translateY(0)
+    }
+}
