@@ -1,198 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Neon Kicks{% endblock %}
+{% block title %}FootBall Physics{% endblock %}
 
 {% block head %}
 <style>
-    .goal-post {
-        width: 300px;
-        height: 150px;
-        border: 5px solid white;
-        border-bottom: none;
-        margin: 0 auto;
-        position: relative;
-        background: rgba(0, 255, 136, 0.1);
-        box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
     }
 
-    .goalie {
-        width: 40px;
-        height: 60px;
-        background: #ff4444;
-        position: absolute;
-        bottom: 0;
-        left: 130px;
-        /* Center */
-        transition: left 0.5s;
-        box-shadow: 0 0 15px #ff4444;
-        border-radius: 5px;
+    canvas {
+        border: 4px solid white;
+        background: #87CEEB;
+        /* Sky Blue */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        max-width: 100%;
     }
 
-    .ball {
-        width: 30px;
-        height: 30px;
-        background: white;
-        border-radius: 50%;
-        margin: 50px auto 0;
-        box-shadow: 0 0 15px white;
-        position: relative;
-        transition: 0.5s;
-    }
-
-    .aim-bar-container {
-        width: 300px;
-        height: 10px;
-        background: #333;
-        margin: 20px auto;
-        border-radius: 5px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .aim-cursor {
-        width: 20px;
-        height: 100%;
-        background: var(--primary);
-        position: absolute;
-        left: 0;
-        animation: aimMove 1.5s infinite alternate ease-in-out;
-    }
-
-    @keyframes aimMove {
-        0% {
-            left: 0;
-        }
-
-        100% {
-            left: 280px;
-        }
-    }
-
-    .paused {
-        animation-play-state: paused;
-    }
-
-    .status-msg {
-        height: 30px;
-        margin-top: 10px;
+    .scoreboard {
+        display: flex;
+        gap: 50px;
+        font-size: 2rem;
         font-weight: bold;
-        font-size: 1.2rem;
+        margin-bottom: 10px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px 30px;
+        border-radius: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .p1-score {
+        color: #4facfe;
+    }
+
+    .p2-score {
+        color: #ff4444;
+    }
+
+    .controls-hint {
+        margin-top: 20px;
+        color: #aaa;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .key {
+        display: inline-block;
+        padding: 2px 6px;
+        border: 1px solid #777;
+        border-radius: 4px;
+        background: #333;
+        color: white;
+        margin: 0 2px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 500px;">
-    <header>
-        <h1>Neon <span class="highlight">Kicks</span></h1>
-    </header>
-
-    <div class="goal-post">
-        <div class="goalie" id="goalie"></div>
+<div class="game-container">
+    <div class="scoreboard">
+        <div class="p1-score">P1: <span id="scoreP1">0</span></div>
+        <div class="p2-score">P2: <span id="scoreP2">0</span></div>
     </div>
 
-    <div id="ball" class="ball"></div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
 
-    <div class="aim-bar-container">
-        <div id="aim-cursor" class="aim-cursor"></div>
+    <div class="controls-hint">
+        <p><span style="color:#4facfe">Player 1</span>: <span class="key">W</span> Jump &nbsp; <span
+                class="key">A</span> Left &nbsp; <span class="key">D</span> Right</p>
+        <p><span style="color:#ff4444">Player 2</span>: <span class="key">↑</span> Jump &nbsp; <span
+                class="key">←</span> Left &nbsp; <span class="key">→</span> Right</p>
     </div>
-
-    <div class="score-hud">
-        Goals: <span id="score" class="highlight">0</span> / <span id="attempts">0</span>
-    </div>
-
-    <div class="status-msg" id="status-msg">Click 'Shoot' to play!</div>
-
-    <button onclick="shoot()" class="btn primary huge" id="action-btn">SHOOT!</button>
-    <button onclick="resetGame()" class="btn secondary" id="retry-btn" style="display:none;">Retry</button>
 </div>
 
-<script>
-    let score = 0;
-    let attempts = 0;
-    let isShooting = false;
-    const goalie = document.getElementById('goalie');
-    const ball = document.getElementById('ball');
-    const cursor = document.getElementById('aim-cursor');
-    const statusMsg = document.getElementById('status-msg');
-
-    function shoot() {
-        if (isShooting) return;
-        isShooting = true;
-        attempts++;
-        document.getElementById('attempts').textContent = attempts;
-
-        // Pause aim
-        const computedStyle = window.getComputedStyle(cursor);
-        const aimPos = parseFloat(computedStyle.left);
-        cursor.style.left = aimPos + 'px';
-        cursor.classList.add('paused');
-
-        // Goalie Random Move
-        const goaliePos = Math.random() < 0.5 ? 50 : 200; // Left or Rightish
-        goalie.style.left = goaliePos + 'px';
-
-        // Ball Move
-        // 300px width. Aim 0-280.
-        // Goalie width 40.
-        // Basic Hit Check
-        const shotTarget = aimPos;
-        const goalieHitboxStart = goaliePos - 20;
-        const goalieHitboxEnd = goaliePos + 60;
-
-        // Animate Kick
-        ball.style.transform = `translate(${shotTarget - 135}px, -150px) scale(0.5)`;
-
-        setTimeout(() => {
-            // Check result
-            let result = "GOAL!";
-            let color = "var(--primary)";
-
-            // Check Save
-            if (shotTarget > goalieHitboxStart && shotTarget < goalieHitboxEnd) {
-                result = "SAVED!";
-                color = "var(--danger)";
-            } else if (shotTarget < 0 || shotTarget > 280) { // Should match bounds
-                // Technically bounds are kept by animation, but just safe check
-            } else {
-                score++;
-            }
-
-            statusMsg.textContent = result;
-            statusMsg.style.color = color;
-            document.getElementById('score').textContent = score;
-
-            // Reset for next
-            if (attempts >= 5) {
-                document.getElementById('action-btn').style.display = 'none';
-                document.getElementById('retry-btn').style.display = 'inline-block';
-                statusMsg.textContent = `Game Over! Score: ${score}/5`;
-                isShooting = false;
-            } else {
-                setTimeout(resetBall, 1500);
-            }
-
-        }, 500);
-    }
-
-    function resetBall() {
-        ball.style.transform = 'translate(0, 0) scale(1)';
-        cursor.classList.remove('paused');
-        cursor.style.left = ''; // Resume animation
-        goalie.style.left = '130px'; // Reset goalie
-        statusMsg.textContent = "Aim and Shoot!";
-        statusMsg.style.color = "white";
-        isShooting = false;
-    }
-
-    function resetGame() {
-        score = 0;
-        attempts = 0;
-        document.getElementById('score').textContent = score;
-        document.getElementById('attempts').textContent = attempts;
-        document.getElementById('action-btn').style.display = 'inline-block';
-        document.getElementById('retry-btn').style.display = 'none';
-        resetBall();
-    }
-</script>
+<script src="{{ url_for('static', filename='game_football.js') }}"></script>
 {% endblock %}
