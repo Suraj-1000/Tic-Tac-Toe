@@ -54,8 +54,13 @@ def football_page():
     return render_template('football.html')
 
 @app.route('/futsal')
-def futsal_page():
-    return render_template('futsal.html')
+def futsal():
+    return render_template('football.html', game_type='futsal') # Reuses football template with config? 
+    # Actually, let's make sure football.html handles the game_type or we pass config
+
+@app.route('/penalty')
+def penalty():
+    return render_template('penalty.html')
 
 # --- HANGMAN API ---
 WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]

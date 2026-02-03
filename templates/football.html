@@ -94,23 +94,29 @@
 </div>
 
 <script>
-    // Configuration for 11v11 Football
+    // Configuration for Football/Futsal
+    // game_type passed from Flask: '{{ game_type }}'
+    const isFutsal = '{{ game_type }}' === 'futsal';
+
     window.SOCCER_CONFIG = {
-        type: 'football',
-        pitchColor: '#2ecc71',
+        type: isFutsal ? 'futsal' : 'football',
+        pitchColor: isFutsal ? '#34495e' : '#2ecc71', // Blue court for futsal
         lineColor: '#FFF',
         ballColor: '#FFF',
-        playersPerTeam: 11,
-        matchDuration: 2700, // 45 minutes scale usually but let's do 5 mins real time? Let's stick to engine timer
+        playersPerTeam: isFutsal ? 5 : 11,
         matchDuration: 300,
         physics: {
-            friction: 0.98, // Grass
-            ballBounce: 0.7,
+            friction: isFutsal ? 0.94 : 0.98, // Court is faster/slippery? Or less friction? 0.94 is more friction (slows down faster). Actually Hard court = fast ball. Grass = slow ball. 
+            // 0.98 (Grass) -> Ball slides long. 
+            // Futsal Hard Court -> Ball rolls fast but stops? 
+            // Let's keep similar for now.
+            friction: 0.97,
+            ballBounce: isFutsal ? 0.8 : 0.7,
             playerSpeed: 3.0,
             sprintSpeed: 5.0,
             kickForce: 8.0
         }
     };
 </script>
-<script src="{{ url_for('static', filename='game_soccer.js') }}"></script>
+<script src="{{ url_for('static', filename='game_soccer.js') }}?v={{ range(1, 10000) | random }}"></script>
 {% endblock %}

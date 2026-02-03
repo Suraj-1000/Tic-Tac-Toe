@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Penalty Shootout{% endblock %}
+
+{% block head %}
+<style>
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    /* Penalty View: Perspective */
+    canvas {
+        border: 4px solid #fff;
+        background: radial-gradient(circle, #2ecc71 0%, #27ae60 100%);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        cursor: crosshair;
+    }
+
+    .scoreboard {
+        display: flex;
+        justify-content: space-between;
+        width: 800px;
+        margin-bottom: 20px;
+        padding: 15px 30px;
+        background: rgba(0, 0, 0, 0.9);
+        border-radius: 15px;
+        color: white;
+        font-family: 'Arial Black', sans-serif;
+        border: 2px solid gold;
+        text-transform: uppercase;
+    }
+
+    .score-box {
+        text-align: center;
+    }
+
+    .score-box .label {
+        font-size: 0.8rem;
+        color: #aaa;
+    }
+
+    .score-box .value {
+        font-size: 3rem;
+        color: #f1c40f;
+    }
+
+    .status {
+        font-size: 1.5rem;
+        color: white;
+        text-align: center;
+        margin-top: 10px;
+        height: 30px;
+    }
+
+    .controls-hint {
+        margin-top: 20px;
+        color: #eee;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .mode-select {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="mode-select">
+        <button onclick="setMode('pvc')" class="btn primary">Player vs CPU</button>
+        <button onclick="setMode('pvp')" class="btn secondary">Player vs Player</button>
+    </div>
+
+    <div class="scoreboard">
+        <div class="score-box">
+            <div class="label">Shooter</div>
+            <div class="value" id="scoreShooter">0</div>
+        </div>
+        <div class="score-box">
+            <div class="label">Keeper</div>
+            <div class="value" id="scoreKeeper">0</div>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    <div class="status" id="gameStatus">Choose a Mode to Start!</div>
+
+    <div class="controls-hint">
+        <p><strong>Shooter:</strong> Click to Aim & Shoot</p>
+        <p><strong>Keeper (PvP):</strong> Left/Right Arrows or A/D to Dive</p>
+    </div>
+</div>
+
+<script>
+    window.setMode = function (mode) {
+        if (window.startGame) window.startGame(mode);
+    };
+</script>
+<script src="{{ url_for('static', filename='game_penalty.js') }}?v={{ range(1, 10000) | random }}"></script>
+{% endblock %}
