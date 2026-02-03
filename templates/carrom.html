@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Neon Carrom{% endblock %}
+
+{% block head %}
+<style>
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    canvas {
+        background: #2c3e50;
+        /* Dark Board */
+        border: 10px solid #8e44ad;
+        /* Neon Purple Frame */
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(142, 68, 173, 0.4);
+        cursor: crosshair;
+    }
+
+    .status {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        color: white;
+        margin-top: 15px;
+        text-shadow: 0 0 10px #fff;
+    }
+
+    .controls-hint {
+        margin-top: 20px;
+        color: #aaa;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <canvas id="carromCanvas" width="600" height="600"></canvas>
+    <div class="status" id="statusText">White's Turn</div>
+    <div class="controls-hint">
+        Click & Drag striker to Aim. Release to Shoot.
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='game_carrom.js') }}?v={{ range(1, 10000) | random }}"></script>
+{% endblock %}

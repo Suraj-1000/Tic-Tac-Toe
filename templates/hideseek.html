@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Neon Hunt: Hide & Seek{% endblock %}
+
+{% block head %}
+<style>
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    canvas {
+        background: #111;
+        border: 2px solid #00ff88;
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    }
+
+    .hud {
+        display: flex;
+        justify-content: space-between;
+        width: 800px;
+        color: white;
+        margin-bottom: 10px;
+        font-family: monospace;
+        font-size: 1.2rem;
+    }
+
+    .instructions {
+        margin-top: 15px;
+        color: #aaa;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        max-width: 600px;
+    }
+
+    .phase-display {
+        color: #f1c40f;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="hud">
+        <div>Role: <span id="roleDisplay">HIDER</span></div>
+        <div class="phase-display" id="phaseDisplay">SETUP PHASE</div>
+        <div>Time: <span id="timeDisplay">30</span></div>
+    </div>
+
+    <canvas id="huntCanvas" width="800" height="600"></canvas>
+
+    <div class="instructions">
+        <p><strong>Hider (P1 - WASD):</strong> Move your object to a hiding spot. Press Space to Lock in.</p>
+        <p><strong>Seeker (P2 - CLICK/ARROWS):</strong> Find the fake object! Click/Space to shoot. Limited ammo!</p>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='game_hideseek.js') }}?v={{ range(1, 10000) | random }}"></script>
+{% endblock %}

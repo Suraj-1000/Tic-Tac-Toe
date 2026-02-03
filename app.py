@@ -62,6 +62,14 @@ def futsal():
 def penalty():
     return render_template('penalty.html')
 
+@app.route('/carrom')
+def carrom_page():
+    return render_template('carrom.html')
+
+@app.route('/hideseek')
+def hideseek_page():
+    return render_template('hideseek.html')
+
 # --- HANGMAN API ---
 WORDS = ["PYTHON", "FLASK", "CODING", "GAMING", "SERVER", "DATABASE", "SCRIPT", "VARIABLE", "FUNCTION", "DEVELOPER"]
 
