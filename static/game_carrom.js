@@ -253,13 +253,110 @@ function resolveCollisions() {
 }
 
 function loop() {
-    ctx.clearRect(0, 0, BOARD_SIZE, BOARD_SIZE);
+    // Draw Board Background and Markings
+    const LINE_COLOR = '#444'; // Or distinct neon?
+    const BASE_COLOR = '#3498db'; // Neon Blue Lines
+
+    // Board Base
+    ctx.fillStyle = '#f5e6d3'; // Light wood-ish beige, or keep dark neon?
+    // User asked for "Real lining", usually red/black on light wood.
+    // Let's go Hybrid: Dark board, Neon Red/Blue lines.
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE);
 
     // Draw Pockets
     ctx.fillStyle = '#000';
     for (let p of POCKETS) {
         ctx.beginPath(); ctx.arc(p.x, p.y, POCKET_RADIUS, 0, Math.PI * 2); ctx.fill();
     }
+
+    // 1. Center Design
+    ctx.beginPath();
+    ctx.arc(BOARD_SIZE / 2, BOARD_SIZE / 2, 60, 0, Math.PI * 2); // Main Center
+    ctx.strokeStyle = '#e74c3c'; // Red Center
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(BOARD_SIZE / 2, BOARD_SIZE / 2, 12, 0, Math.PI * 2); // Close Center
+    ctx.fillStyle = '#e74c3c';
+    ctx.fill();
+
+    // Star Pattern?
+    // Let's stick to simple concentric rings for "Neon Style"
+    ctx.beginPath();
+    ctx.arc(BOARD_SIZE / 2, BOARD_SIZE / 2, 100, 0, Math.PI * 2);
+    ctx.strokeStyle = '#34495e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 2. Baselines (The "Lining")
+    const BASE_MARGIN = 80;
+    const STRIKER_LINE_W = 25; // Gap between double lines
+
+    // Helper to draw horizontal baseline
+    function drawBaselineH(y, color) {
+        ctx.beginPath();
+        // Line 1
+        ctx.moveTo(BASE_MARGIN, y);
+        ctx.lineTo(BOARD_SIZE - BASE_MARGIN, y);
+        // Line 2
+        ctx.moveTo(BASE_MARGIN, y + STRIKER_LINE_W);
+        ctx.lineTo(BOARD_SIZE - BASE_MARGIN, y + STRIKER_LINE_W);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Circles at ends
+        ctx.beginPath(); ctx.arc(BASE_MARGIN, y + STRIKER_LINE_W / 2, 10, 0, Math.PI * 2); ctx.stroke(); // Left
+        ctx.fillStyle = '#e74c3c'; ctx.fill();
+
+        ctx.beginPath(); ctx.arc(BOARD_SIZE - BASE_MARGIN, y + STRIKER_LINE_W / 2, 10, 0, Math.PI * 2); ctx.stroke(); // Right
+        ctx.fill();
+    }
+
+    // Helper to draw vertical baseline
+    function drawBaselineV(x, color) {
+        ctx.beginPath();
+        // Line 1
+        ctx.moveTo(x, BASE_MARGIN);
+        ctx.lineTo(x, BOARD_SIZE - BASE_MARGIN);
+        // Line 2
+        ctx.moveTo(x + STRIKER_LINE_W, BASE_MARGIN);
+        ctx.lineTo(x + STRIKER_LINE_W, BOARD_SIZE - BASE_MARGIN);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Circles
+        ctx.beginPath(); ctx.arc(x + STRIKER_LINE_W / 2, BASE_MARGIN, 10, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#e74c3c'; ctx.fill();
+
+        ctx.beginPath(); ctx.arc(x + STRIKER_LINE_W / 2, BOARD_SIZE - BASE_MARGIN, 10, 0, Math.PI * 2); ctx.stroke();
+        ctx.fill();
+    }
+
+    drawBaselineH(100, BASE_COLOR); // Top
+    drawBaselineH(BOARD_SIZE - 125, BASE_COLOR); // Bottom (Striker line usually closer?)
+    drawBaselineV(100, BASE_COLOR); // Left
+    drawBaselineV(BOARD_SIZE - 125, BASE_COLOR); // Right
+
+    // 3. Diagonal Arrows
+    function drawArrow(p1, p2) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+    // Roughly from corner to circle
+    drawArrow({ x: 0, y: 0 }, { x: 180, y: 180 });
+    drawArrow({ x: BOARD_SIZE, y: 0 }, { x: BOARD_SIZE - 180, y: 180 });
+    drawArrow({ x: BOARD_SIZE, y: BOARD_SIZE }, { x: BOARD_SIZE - 180, y: BOARD_SIZE - 180 });
+    drawArrow({ x: 0, y: BOARD_SIZE }, { x: 180, y: BOARD_SIZE - 180 });
 
     // Update & Draw
     let moving = false;
